@@ -1,0 +1,85 @@
+{% extends 'hrms_app/base.html' %}
+
+{% block title %}Home - HRMS{% endblock %}
+
+{% block content %}
+<div class="home-container">
+    <div class="welcome-section">
+        <h2>Welcome to HRMS</h2>
+        <p class="subtitle">Human Resource Management System</p>
+        <p>Manage your employees, track attendance, and generate reports all in one place.</p>
+    </div>
+    
+    <div class="stats-section">
+        <div class="stat-card">
+            <h3>{{ total_employees }}</h3>
+            <p>Total Employees</p>
+        </div>
+        <div class="stat-card">
+            <h3>Active</h3>
+            <p>System Status</p>
+        </div>
+    </div>
+    
+    <div class="quick-actions">
+        <h3>Quick Actions</h3>
+        <div class="action-buttons">
+            <a href="{% url 'hrms_app:employee_list' %}" class="btn btn-primary">View All Employees</a>
+            <a href="{% url 'hrms_app:reports' %}" class="btn btn-secondary">View Reports</a>
+            <a href="/admin/hrms_app/employee/add/" class="btn btn-success">Add Employee</a>
+        </div>
+    </div>
+    
+    <div class="recent-employees">
+        <h3>Recent Employees</h3>
+        {% if employees %}
+            <div class="employee-grid">
+                {% for employee in employees %}
+                    <div class="employee-card">
+                        <div class="employee-header">
+                            <h4>{{ employee.name }}</h4>
+                            <span class="badge badge-{{ employee.department|lower }}">{{ employee.department }}</span>
+                        </div>
+                        <div class="employee-info">
+                            <p><strong>ID:</strong> {{ employee.employee_id }}</p>
+                            <p><strong>Designation:</strong> {{ employee.designation }}</p>
+                            <p><strong>Email:</strong> {{ employee.email }}</p>
+                            <p><strong>Joined:</strong> {{ employee.date_of_joining }}</p>
+                        </div>
+                        <a href="{% url 'hrms_app:employee_detail' employee.id %}" class="btn btn-sm btn-outline">View Details</a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="no-data">No employees found. <a href="/admin/hrms_app/employee/add/">Add your first employee</a></p>
+        {% endif %}
+    </div>
+    
+    <div class="api-info">
+        <h3>API Endpoints</h3>
+        <div class="api-endpoints">
+            <div class="api-endpoint">
+                <span class="method get">GET</span>
+                <code>/api/employees/</code>
+                <span>Get all employees</span>
+            </div>
+            <div class="api-endpoint">
+                <span class="method post">POST</span>
+                <code>/api/employees/</code>
+                <span>Add new employee</span>
+            </div>
+            <div class="api-endpoint">
+                <span class="method get">GET</span>
+                <code>/api/attendance/</code>
+                <span>Get attendance records</span>
+            </div>
+            <div class="api-endpoint">
+                <span class="method post">POST</span>
+                <code>/api/attendance/</code>
+                <span>Mark attendance</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

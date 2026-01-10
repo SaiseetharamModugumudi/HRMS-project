@@ -1,0 +1,181 @@
+{% extends 'hrms_app/base.html' %}
+
+{% block title %}Reports - HRMS{% endblock %}
+
+{% block extra_css %}{% endblock %}
+
+{% block content %}
+<div class="reports-container">
+    <div class="page-header">
+        <h2>HRMS Reports</h2>
+    </div>
+    
+    <div class="report-summary">
+        <div class="summary-card">
+            <h3>{{ total_employees }}</h3>
+            <p>Total Employees</p>
+        </div>
+        <div class="summary-card">
+            <h3>{{ total_departments }}</h3>
+            <p>Departments</p>
+        </div>
+        <div class="summary-card">
+            <h3>{{ total_designations }}</h3>
+            <p>Designations</p>
+        </div>
+    </div>
+    
+    <div class="charts-section">
+        <div class="chart-card">
+            <h3>Employees by Department</h3>
+            <canvas id="departmentChart"></canvas>
+            <div class="chart-table">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Department</th>
+                            <th>Count</th>
+                            <th>Percentage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for stat in department_stats %}
+                            <tr>
+                                <td>{{ stat.department }}</td>
+                                <td>{{ stat.count }}</td>
+                                <td>
+                                    {% widthratio stat.count total_employees 100 %}%
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="chart-card">
+            <h3>Employees by Designation</h3>
+            <canvas id="designationChart"></canvas>
+            <div class="chart-table">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Designation</th>
+                            <th>Count</th>
+                            <th>Percentage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for stat in designation_stats %}
+                            <tr>
+                                <td>{{ stat.designation }}</td>
+                                <td>{{ stat.count }}</td>
+                                <td>
+                                    {% widthratio stat.count total_employees 100 %}%
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% load static %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+{{ departments|json_script:"departments-data" }}
+{{ counts|json_script:"counts-data" }}
+{{ designations|json_script:"designations-data" }}
+{{ designation_counts|json_script:"designation-counts-data" }}
+<script>
+    // Department Chart Data
+    const departments = JSON.parse(document.getElementById('departments-data').textContent);
+    const departmentCounts = JSON.parse(document.getElementById('counts-data').textContent);
+    
+    // Designation Chart Data
+    const designations = JSON.parse(document.getElementById('designations-data').textContent);
+    const designationCounts = JSON.parse(document.getElementById('designation-counts-data').textContent);
+    
+    // Department Chart
+    const departmentCtx = document.getElementById('departmentChart').getContext('2d');
+    const departmentChart = new Chart(departmentCtx, {
+        type: 'bar',
+        data: {
+            labels: departments,
+            datasets: [{
+                label: 'Employees',
+                data: departmentCounts,
+                backgroundColor: [
+                    'rgba(54, 162, 235, 0.6)',
+                    'rgba(255, 99, 132, 0.6)',
+                    'rgba(255, 206, 86, 0.6)',
+                    'rgba(75, 192, 192, 0.6)',
+                    'rgba(153, 102, 255, 0.6)',
+                    'rgba(255, 159, 64, 0.6)',
+                    'rgba(199, 199, 199, 0.6)'
+                ],
+                borderColor: [
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(199, 199, 199, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+    
+    // Designation Chart
+    const designationCtx = document.getElementById('designationChart').getContext('2d');
+    const designationChart = new Chart(designationCtx, {
+        type: 'pie',
+        data: {
+            labels: designations,
+            datasets: [{
+                label: 'Employees',
+                data: designationCounts,
+                backgroundColor: [
+                    'rgba(54, 162, 235, 0.6)',
+                    'rgba(255, 99, 132, 0.6)',
+                    'rgba(255, 206, 86, 0.6)',
+                    'rgba(75, 192, 192, 0.6)',
+                    'rgba(153, 102, 255, 0.6)',
+                    'rgba(255, 159, 64, 0.6)',
+                    'rgba(199, 199, 199, 0.6)'
+                ],
+                borderColor: [
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(199, 199, 199, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+</script>
+{% endblock %}
+

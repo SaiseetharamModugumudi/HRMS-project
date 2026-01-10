@@ -1,0 +1,12 @@
+{% extends 'hrms_app/base.html' %}
+
+{% block title %}Error - HRMS{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <h2>Error</h2>
+    <p>{{ error }}</p>
+    <a href="{% url 'hrms_app:home' %}" class="btn btn-primary">Go to Home</a>
+</div>
+{% endblock %}
+

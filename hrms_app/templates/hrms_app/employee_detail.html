@@ -1,0 +1,120 @@
+{% extends 'hrms_app/base.html' %}
+
+{% block title %}{{ employee.name }} - HRMS{% endblock %}
+
+{% block content %}
+<div class="employee-detail-container">
+    <div class="detail-header">
+        <a href="{% url 'hrms_app:employee_list' %}" class="btn btn-outline">← Back to Employees</a>
+        <h2>Employee Details</h2>
+    </div>
+    
+    <div class="employee-profile">
+        <div class="profile-card">
+            <div class="profile-header">
+                <h3>{{ employee.name }}</h3>
+                <span class="badge badge-{{ employee.department|lower }}">{{ employee.department }}</span>
+            </div>
+            <div class="profile-info">
+                <div class="info-row">
+                    <span class="label">Employee ID:</span>
+                    <span class="value">{{ employee.employee_id }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Email:</span>
+                    <span class="value">{{ employee.email }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Phone:</span>
+                    <span class="value">{{ employee.phone }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Address:</span>
+                    <span class="value">{{ employee.address }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Designation:</span>
+                    <span class="value">{{ employee.designation }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Department:</span>
+                    <span class="value">{{ employee.department }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Date of Joining:</span>
+                    <span class="value">{{ employee.date_of_joining }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="attendance-stats">
+            <h3>Attendance Statistics</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-value">{{ total_present }}</span>
+                    <span class="stat-label">Present</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">{{ total_absent }}</span>
+                    <span class="stat-label">Absent</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">{{ total_leave }}</span>
+                    <span class="stat-label">Leave</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">{{ total_half_day }}</span>
+                    <span class="stat-label">Half Day</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="attendance-section">
+        <h3>Attendance Records</h3>
+        {% if attendances %}
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>In Time</th>
+                            <th>Out Time</th>
+                            <th>Work Hours</th>
+                            <th>Status</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for attendance in attendances %}
+                            <tr>
+                                <td>{{ attendance.date }}</td>
+                                <td>{{ attendance.in_time|default:"-" }}</td>
+                                <td>{{ attendance.out_time|default:"-" }}</td>
+                                <td>
+                                    {% if attendance.in_time and attendance.out_time %}
+                                        {{ attendance.calculate_work_hours }} hrs
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge badge-status-{{ attendance.status|lower|cut:' ' }}">
+                                        {{ attendance.status }}
+                                    </span>
+                                </td>
+                                <td>{{ attendance.notes|default:"-" }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="no-data">
+                <p>No attendance records found for this employee.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
