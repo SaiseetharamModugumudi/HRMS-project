@@ -78,21 +78,43 @@ WSGI_APPLICATION = 'hrms_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# Use PostgreSQL if DATABASE_URL is provided (Render), otherwise use SQLite for local development
-# import os
-if os.environ.get("RENDER"):
-# Production (Render + Railway MySQL)
+# Use PostgreSQL if DATABASE_URL is provided (Render), 
+# or MySQL if MySQL env vars are set, otherwise use SQLite for local development
+DATABASE_URL = os.environ.get('DATABASE_URL')
+
+if DATABASE_URL:
+    # Use PostgreSQL (Render default)
     DATABASES = {
-    "default": {
-    "ENGINE": "django.db.backends.mysql",
-    "NAME": os.environ.get("MYSQLDATABASE"),
-    "USER": os.environ.get("MYSQLUSER"),
-    "PASSWORD": os.environ.get("MYSQLPASSWORD"),
-    "HOST": os.environ.get("MYSQLHOST"),
-    "PORT": os.environ.get("MYSQLPORT", "3306"),
+        'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)
     }
-}
+elif os.environ.get("RENDER"):
+    # Production on Render - try MySQL if environment variables are set
+    mysql_host = os.environ.get("MYSQLHOST")
+    mysql_database = os.environ.get("MYSQLDATABASE")
+    mysql_user = os.environ.get("MYSQLUSER")
+    
+    if mysql_host and mysql_database and mysql_user:
+        # MySQL configuration is available
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.mysql",
+                "NAME": mysql_database,
+                "USER": mysql_user,
+                "PASSWORD": os.environ.get("MYSQLPASSWORD", ""),
+                "HOST": mysql_host,
+                "PORT": os.environ.get("MYSQLPORT", "3306"),
+            }
+        }
+    else:
+        # Fall back to SQLite if MySQL env vars are not set
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': BASE_DIR / 'db.sqlite3',
+            }
+        }
 else:
+    # Local development - use SQLite
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
