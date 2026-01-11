@@ -26,7 +26,8 @@
         <div class="action-buttons">
             <a href="{% url 'hrms_app:employee_list' %}" class="btn btn-primary">View All Employees</a>
             <a href="{% url 'hrms_app:reports' %}" class="btn btn-secondary">View Reports</a>
-            <a href="/admin/hrms_app/employee/add/" class="btn btn-success">Add Employee</a>
+            <a href="{% url 'hrms_app:add_employee' %}" class="btn btn-success">Add Employee</a>
+            <a href="{% url 'hrms_app:add_attendance' %}" class="btn btn-primary">Mark Attendance</a>
         </div>
     </div>
     
@@ -51,7 +52,7 @@
                 {% endfor %}
             </div>
         {% else %}
-            <p class="no-data">No employees found. <a href="/admin/hrms_app/employee/add/">Add your first employee</a></p>
+            <p class="no-data">No employees found. <a href="{% url 'hrms_app:add_employee' %}">Add your first employee</a></p>
         {% endif %}
     </div>
     

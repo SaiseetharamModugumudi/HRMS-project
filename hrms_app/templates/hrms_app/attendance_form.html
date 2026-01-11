@@ -1,0 +1,88 @@
+{% extends 'hrms_app/base.html' %}
+
+{% block title %}{{ title|default:"Mark Attendance" }} - HRMS{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="page-header">
+        <h2>{{ title|default:"Mark Attendance" }}</h2>
+        <a href="{% url 'hrms_app:home' %}" class="btn btn-outline">← Back to Home</a>
+    </div>
+    
+    <div class="form-card">
+        <form method="post" class="attendance-form">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+                <div class="alert alert-error">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.employee.id_for_label }}">Employee <span class="required">*</span></label>
+                    {{ form.employee }}
+                    {% if form.employee.errors %}
+                        <div class="error-text">{{ form.employee.errors }}</div>
+                    {% endif %}
+                    <small class="form-help-text">Select an employee from the list</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.date.id_for_label }}">Date <span class="required">*</span></label>
+                    {{ form.date }}
+                    {% if form.date.errors %}
+                        <div class="error-text">{{ form.date.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.status.id_for_label }}">Status <span class="required">*</span></label>
+                    {{ form.status }}
+                    {% if form.status.errors %}
+                        <div class="error-text">{{ form.status.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.in_time.id_for_label }}">In Time</label>
+                    {{ form.in_time }}
+                    {% if form.in_time.errors %}
+                        <div class="error-text">{{ form.in_time.errors }}</div>
+                    {% endif %}
+                    <small class="form-help-text">Optional - Check-in time</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.out_time.id_for_label }}">Out Time</label>
+                    {{ form.out_time }}
+                    {% if form.out_time.errors %}
+                        <div class="error-text">{{ form.out_time.errors }}</div>
+                    {% endif %}
+                    <small class="form-help-text">Optional - Check-out time</small>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.notes.id_for_label }}">Notes</label>
+                {{ form.notes }}
+                {% if form.notes.errors %}
+                    <div class="error-text">{{ form.notes.errors }}</div>
+                {% endif %}
+                <small class="form-help-text">Optional - Additional notes about attendance</small>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Mark Attendance</button>
+                <a href="{% url 'hrms_app:home' %}" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+

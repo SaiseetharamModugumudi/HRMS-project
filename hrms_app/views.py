@@ -9,10 +9,12 @@ from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from django.db.models import Count, Q
+from django.contrib import messages
 from datetime import datetime, date
 import json as json_lib
 
 from .models import Employee, Attendance
+from .forms import EmployeeForm, AttendanceForm
 
 
 def home(request):
@@ -485,5 +487,55 @@ def reports(request):
         'total_employees': total_employees,
         'total_departments': total_departments,
         'total_designations': total_designations,
+    })
+
+
+def add_employee(request):
+    """
+    View to add a new employee using a form.
+    
+    Args:
+        request: HTTP request object
+        
+    Returns:
+        HttpResponse: Rendered employee form template or redirect after successful submission
+    """
+    if request.method == 'POST':
+        form = EmployeeForm(request.POST)
+        if form.is_valid():
+            employee = form.save()
+            messages.success(request, f'Employee {employee.name} has been added successfully!')
+            return redirect('hrms_app:employee_detail', employee_id=employee.id)
+    else:
+        form = EmployeeForm()
+    
+    return render(request, 'hrms_app/employee_form.html', {
+        'form': form,
+        'title': 'Add New Employee'
+    })
+
+
+def add_attendance(request):
+    """
+    View to mark attendance for an employee using a form.
+    
+    Args:
+        request: HTTP request object
+        
+    Returns:
+        HttpResponse: Rendered attendance form template or redirect after successful submission
+    """
+    if request.method == 'POST':
+        form = AttendanceForm(request.POST)
+        if form.is_valid():
+            attendance = form.save()
+            messages.success(request, f'Attendance for {attendance.employee.name} on {attendance.date} has been marked successfully!')
+            return redirect('hrms_app:employee_detail', employee_id=attendance.employee.id)
+    else:
+        form = AttendanceForm()
+    
+    return render(request, 'hrms_app/attendance_form.html', {
+        'form': form,
+        'title': 'Mark Attendance'
     })
 

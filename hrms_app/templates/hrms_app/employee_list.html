@@ -5,7 +5,10 @@
 {% block content %}
 <div class="page-header">
     <h2>Employee Management</h2>
-    <a href="/admin/hrms_app/employee/add/" class="btn btn-primary">Add New Employee</a>
+    <div style="display: flex; gap: 1rem;">
+        <a href="{% url 'hrms_app:add_employee' %}" class="btn btn-primary">Add New Employee</a>
+        <a href="{% url 'hrms_app:add_attendance' %}" class="btn btn-secondary">Mark Attendance</a>
+    </div>
 </div>
 
 <div class="filters-section">
@@ -64,7 +67,7 @@
         </table>
     {% else %}
         <div class="no-data">
-            <p>No employees found. <a href="/admin/hrms_app/employee/add/">Add your first employee</a></p>
+            <p>No employees found. <a href="{% url 'hrms_app:add_employee' %}">Add your first employee</a></p>
         </div>
     {% endif %}
 </div>

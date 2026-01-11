@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
-import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +24,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-hrms-project-development-key-change-in-production')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+# Default to True for local development, False for production
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
 
@@ -78,14 +78,19 @@ WSGI_APPLICATION = 'hrms_project.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 # Use PostgreSQL if DATABASE_URL is provided (Render), otherwise use SQLite for local development
-if os.environ.get('DATABASE_URL'):
+# import os
+if os.environ.get("RENDER"):
+# Production (Render + Railway MySQL)
     DATABASES = {
-        'default': dj_database_url.config(
-            default=os.environ.get('DATABASE_URL'),
-            conn_max_age=600,
-            conn_health_checks=True,
-        )
+    "default": {
+    "ENGINE": "django.db.backends.mysql",
+    "NAME": os.environ.get("MYSQLDATABASE"),
+    "USER": os.environ.get("MYSQLUSER"),
+    "PASSWORD": os.environ.get("MYSQLPASSWORD"),
+    "HOST": os.environ.get("MYSQLHOST"),
+    "PORT": os.environ.get("MYSQLPORT", "3306"),
     }
+}
 else:
     DATABASES = {
         'default': {
@@ -93,7 +98,6 @@ else:
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -138,8 +142,10 @@ static_dir = BASE_DIR / 'static'
 if static_dir.exists():
     STATICFILES_DIRS.append(static_dir)
 
-# WhiteNoise configuration for static files
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# WhiteNoise configuration for static files (production only)
+# Use WhiteNoise storage only in production, Django's default in development
+if not DEBUG:
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
